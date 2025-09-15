@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Crypto Price Tracker</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="mb-4">📈 Crypto Price Tracker</h1>
+
+        <!-- Watchlist Form -->
+        <form method="POST" class="mb-4">
+            <div class="row g-2">
+                <div class="col-md-8">
+                    <input type="text" name="cryptos" class="form-control" placeholder="Enter coins separated by comma" value="{{ ','.join(cryptos) }}">
+                </div>
+                <div class="col-md-2">
+                    <select name="currency" class="form-select">
+                        <option value="usd" {% if currency == 'usd' %}selected{% endif %}>USD</option>
+                        <option value="eur" {% if currency == 'eur' %}selected{% endif %}>EUR</option>
+                        <option value="btc" {% if currency == 'btc' %}selected{% endif %}>BTC</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-success w-100">Update Watchlist</button>
+                </div>
+            </div>
+        </form>
+
+        <!-- Watchlist Prices -->
+        <h3>Watchlist Prices</h3>
+        <table class="table table-dark table-striped">
+            <thead>
+                <tr><th>Coin</th><th>Price ({{ currency.upper() }})</th></tr>
+            </thead>
+            <tbody>
+                {% for coin in cryptos %}
+                <tr>
+                    <td>
+                        <a href="javascript:void(0);" onclick="loadChart('{{ coin }}')">
+                            {{ coin.upper() }}
+                        </a>
+                    </td>
+                    <td>{{ "%.2f"|format(prices[coin][currency]) if prices.get(coin) and prices[coin][currency] else "N/A" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Price Chart (moved above Trending Coins) -->
+        <h3 class="mt-5">📊 Coin Price Chart</h3>
+        <canvas id="priceChart" height="150"></canvas>
+
+        <!-- Trending Coins -->
+        <h3 class="mt-5">🔥 Trending Coins</h3>
+        <div class="row" id="trending-coins">
+            {% for t in trending %}
+            <div class="col-md-3 mb-3">
+                <div class="card bg-secondary text-white h-100 shadow-sm {{ t.color_class }}" onclick="loadChart('{{ t.item.id }}')">
+                    <div class="card-body text-center">
+                        <h4 class="{{ t.color_class }}">{{ t.item.symbol.upper() }}</h4>
+                        <h5 class="{{ t.color_class }}">{{ t.item.name }}</h5>
+                        <p class="text-light">Rank #{{ t.item.score + 1 }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Portfolio -->
+        <h3 class="mt-5">💰 Portfolio</h3>
+        <table class="table table-dark table-striped">
+            <thead>
+                <tr>
+                    <th>Coin</th><th>Amount</th><th>Price ({{ currency.upper() }})</th><th>Value ({{ currency.upper() }})</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in portfolio %}
+                <tr>
+                    <td>{{ p.coin.upper() }}</td>
+                    <td>{{ p.amount }}</td>
+                    <td>{{ "%.2f"|format(p.price) }}</td>
+                    <td>{{ "%.2f"|format(p.value) }}</td>
+                </tr>
+                {% endfor %}
+                <tr class="table-success">
+                    <td colspan="3"><strong>Total Portfolio Value</strong></td>
+                    <td><strong>{{ "%.2f"|format(total_value) }}</strong></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        let chart;
+        function loadChart(coin) {
+            fetch(`/history/${coin}?currency={{ currency }}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (!data || (data.length === 1 && data[0][1] === 0)) {
+                        alert("No historical data available for this coin.");
+                        return;
+                    }
+
+                    const labels = data.map(d => new Date(d[0]).toLocaleDateString());
+                    const prices = data.map(d => d[1]);
+                    const ctx = document.getElementById("priceChart").getContext("2d");
+
+                    if (chart) chart.destroy();
+
+                    chart = new Chart(ctx, {
+                        type: "line",
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: `${coin.toUpperCase()} Price`,
+                                data: prices,
+                                borderColor: "#00c853",
+                                backgroundColor: "rgba(0,200,83,0.1)",
+                                tension: 0.1,
+                                pointRadius: 3
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: { display: true, labels: { color: "#e0e0e0", font: { size: 14 } } },
+                                tooltip: { mode: "index", intersect: false }
+                            },
+                            scales: {
+                                x: { ticks: { color: "#e0e0e0", font: { size: 12 } }, grid: { color: "rgba(255,255,255,0.1)" } },
+                                y: { ticks: { color: "#e0e0e0", font: { size: 12 } }, grid: { color: "rgba(255,255,255,0.1)" } }
+                            }
+                        }
+                    });
+                });
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

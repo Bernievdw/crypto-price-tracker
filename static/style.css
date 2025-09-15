@@ -1,0 +1,74 @@
+body {
+  background: #121212;
+  color: #e0e0e0;
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.6;
+}
+
+h1, h3 {
+  color: #00ffcc;
+  font-weight: 600;
+}
+
+.container {
+  max-width: 1100px;
+}
+
+.table {
+  border-radius: 12px;
+  overflow: hidden;
+}
+.table-dark th {
+  background-color: #1e1e1e;
+}
+.table-dark td {
+  background-color: #181818;
+}
+
+.btn-success {
+  background: linear-gradient(45deg, #00c853, #64dd17);
+  border: none;
+  font-weight: bold;
+}
+.btn-success:hover {
+  background: linear-gradient(45deg, #64dd17, #00c853);
+}
+
+.btn-primary {
+  background: linear-gradient(45deg, #2979ff, #00b0ff);
+  border: none;
+  font-weight: bold;
+}
+.btn-primary:hover {
+  background: linear-gradient(45deg, #00b0ff, #2979ff);
+}
+
+#priceChart {
+  margin-top: 25px;
+  background: #1c1c1c;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 0 15px rgba(0, 255, 204, 0.3);
+}
+
+.color0 { border-left: 5px solid #00c853 !important; color: #00c853 !important; }
+.color1 { border-left: 5px solid #2979ff !important; color: #2979ff !important; }
+.color2 { border-left: 5px solid #ff9100 !important; color: #ff9100 !important; }
+.color3 { border-left: 5px solid #d500f9 !important; color: #d500f9 !important; }
+.color4 { border-left: 5px solid #ff1744 !important; color: #ff1744 !important; }
+.color5 { border-left: 5px solid #00b0ff !important; color: #00b0ff !important; }
+.color6 { border-left: 5px solid #ffd600 !important; color: #ffd600 !important; }
+
+.card { cursor: pointer; }
+#trending-coins .card {
+  border-radius: 12px;
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+#trending-coins .card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(255, 255, 255, 0.2);
+}
+#trending-coins h4, #trending-coins h5 {
+  font-weight: bold;
+}
